@@ -3,14 +3,18 @@
 
   "compilerOptions": {
     "lib": ["es2024"],
-    "module": "nodenext",
+    "module": "es2020",
     "target": "es2024",
+    "moduleResolution": "bundler",
+
+    "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["src/*"]
     },
+    "types": ["jest"],
     "outDir": "dist",
     "rootDir": "./",
-    "moduleResolution": "nodenext",
     "allowImportingTsExtensions": false,
     "noEmit": true,
     "strict": true,
