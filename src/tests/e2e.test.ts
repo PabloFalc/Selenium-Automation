@@ -85,6 +85,10 @@ describe("Teste completo e2e de Swag Labs", () => {
       timeout,
     );
 
+    await driver.wait(until.elementIsVisible(cartLink), timeout);
+    await driver.wait(until.elementIsEnabled(cartLink), timeout);
+
+    expect(cartLink).toBeDefined();
     await cartLink.click();
 
     console.log("SETP: CARRINHO");
