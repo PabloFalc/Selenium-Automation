@@ -84,7 +84,7 @@ describe("Teste completo e2e de Swag Labs", () => {
           .getText();
 
         return Number(text) === index + 1;
-      }, 10000);
+      }, timeout);
 
       const badge = await driver
         .findElement(By.className("shopping_cart_badge"))
