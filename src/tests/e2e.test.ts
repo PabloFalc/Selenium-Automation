@@ -1,4 +1,4 @@
-import { By, Key, until, type WebDriver } from "selenium-webdriver";
+import { By, until, type WebDriver } from "selenium-webdriver";
 import { env } from "@/config/env";
 import { createDriver } from "@/config/selenium.driver";
 
@@ -35,8 +35,8 @@ describe("Teste completo e2e de Swag Labs", () => {
 
     expect(button).toBeDefined();
 
-    user.clear();
-    password.clear();
+    await user.clear();
+    await password.clear();
 
     await user.sendKeys(env.USER);
     await password.sendKeys(env.PASSWORD);
@@ -115,7 +115,7 @@ describe("Teste completo e2e de Swag Labs", () => {
 
     const backHome = await driver.findElement(By.id("back-to-products"));
     expect(backHome).toBeDefined();
-    backHome.click();
+    await backHome.click();
 
     await driver.wait(until.urlContains("inventory"), 10 * 1000);
 

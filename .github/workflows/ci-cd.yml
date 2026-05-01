@@ -1,0 +1,45 @@
+name: selenium ci-cd pipeline
+on:
+  push:
+    branches: [main, develop]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      USER: standard_user
+      PASSWORD: secret_sauce
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: "pnpm"
+
+      - run: pnpm install
+
+      - name: testes
+        run: pnpm test
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: "pnpm"
+
+      - run: pnpm install
+
+      - name: Build
+        run: pnpm build
+
+      - name: upload do build
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-files
+          path: dist/
