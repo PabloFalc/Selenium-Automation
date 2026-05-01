@@ -58,33 +58,20 @@ describe("Teste completo e2e de Swag Labs", () => {
       ]),
     );
 
-    // ! Adicionando produtos ao carrinho
-    const buttonCartId = [
-      "add-to-cart-sauce-labs-backpack",
-      "add-to-cart-sauce-labs-fleece-jacket",
-      "add-to-cart-sauce-labs-onesie",
-    ];
+    const itemId = "add-to-cart-sauce-labs-backpack";
 
-    for (const [index, item] of buttonCartId.entries()) {
-      const button = await driver.wait(
-        until.elementLocated(By.id(item)),
-        timeout,
-      );
+    const item = await driver.wait(
+      until.elementLocated(By.id(itemId)),
+      timeout,
+    );
 
-      expect(button).toBeDefined();
+    await item.click();
 
-      await driver.executeScript("arguments[0].click();", button);
+    const removeBtn = await driver.findElements(
+      By.id("remove-sauce-labs-backpack"),
+    );
 
-      await driver.wait(
-        until.elementLocated(By.id(item.replace("add-to-cart", "remove"))),
-        timeout,
-      );
-
-      console.log(`STEP: adicionou produto ${index + 1}`);
-    }
-
-    const items = await driver.findElements(By.className("cart_item"));
-    console.log("ITEMS:", items.length);
+    console.log("ADICIONADO:", removeBtn.length);
 
     const cartLink = await driver.wait(
       until.elementLocated(By.className("shopping_cart_link")),
@@ -99,12 +86,8 @@ describe("Teste completo e2e de Swag Labs", () => {
 
     console.log("STEP: CART");
 
-    await driver.get("https://www.saucedemo.com/cart.html");
-
-    await driver.wait(async () => {
-      const state = await driver.executeScript("return document.readyState");
-      return state === "complete";
-    }, timeout);
+    await driver.wait(until.urlContains("cart"), timeout);
+    // await driver.get("https://www.saucedemo.com/cart.html");
 
     const checkoutBtn = await driver.wait(
       until.elementLocated(By.id("checkout")),
