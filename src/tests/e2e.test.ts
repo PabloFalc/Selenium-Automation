@@ -67,7 +67,7 @@ describe("Teste completo e2e de Swag Labs", () => {
     const buttonCartId = [
       "add-to-cart-sauce-labs-backpack",
       "add-to-cart-sauce-labs-fleece-jacket",
-      "add-to-cart-sauce-labs-bolt-t-shirt",
+      "add-to-cart-sauce-labs-onesie",
     ];
 
     for (const [index, item] of buttonCartId.entries()) {
@@ -79,15 +79,16 @@ describe("Teste completo e2e de Swag Labs", () => {
       await button.click();
       console.log(`STEP: adicionou produto ${index + 1}`);
     }
-
     await driver.findElement(By.className("shopping_cart_link")).click();
 
     await driver.wait(until.urlContains("cart"), timeout);
+    console.log("STEP: carrinho");
 
     await driver.findElement(By.id("checkout")).click();
 
     // ! ETAPA 1 do checkout
     await driver.wait(until.urlContains("checkout-step-one"), timeout);
+    console.log("STEP: checkout step 1");
 
     const [firstName, lastName, zipCode, continueButton] = await Promise.all([
       driver.findElement(By.id("first-name")),
@@ -104,12 +105,13 @@ describe("Teste completo e2e de Swag Labs", () => {
 
     // ! Etapa dois
     await driver.wait(until.urlContains("checkout-step-two"), timeout);
+    console.log("STEP: checkout step 2");
 
     await driver.findElement(By.id("finish")).click();
 
     // ! Finalização
     await driver.wait(until.urlContains("checkout-complete"), timeout);
-
+    console.log("STEP: checkout complete");
     const completeOrder = await driver
       .findElement(By.id("checkout_complete_container"))
       .findElement(By.className("complete-header"))
@@ -122,7 +124,7 @@ describe("Teste completo e2e de Swag Labs", () => {
     await backHome.click();
 
     await driver.wait(until.urlContains("inventory"), timeout);
-
+    console.log("STEP: end");
     const backToHomeTitle = await driver.getCurrentUrl();
 
     expect(backToHomeTitle).toBe("https://www.saucedemo.com/inventory.html");
