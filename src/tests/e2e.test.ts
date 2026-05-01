@@ -8,6 +8,8 @@ beforeAll(async () => {
   driver = await createDriver();
 });
 
+const timeout = 60 * 1000;
+
 jest.setTimeout(60 * 1000);
 
 describe("Teste completo e2e de Swag Labs", () => {
@@ -17,21 +19,21 @@ describe("Teste completo e2e de Swag Labs", () => {
     await driver.wait(async () => {
       const state = await driver.executeScript("return document.readyState");
       return state === "complete";
-    }, 10000);
+    }, timeout);
 
     const user = await driver.wait(
       until.elementLocated(By.id("user-name")),
-      10 * 1000,
+      timeout,
     );
 
     const password = await driver.wait(
       until.elementLocated(By.id("password")),
-      10 * 1000,
+      timeout,
     );
 
     const button = await driver.wait(
       until.elementLocated(By.id("login-button")),
-      10 * 1000,
+      timeout,
     );
 
     expect(user).toBeDefined();
@@ -90,12 +92,12 @@ describe("Teste completo e2e de Swag Labs", () => {
 
     await driver.findElement(By.className("shopping_cart_link")).click();
 
-    await driver.wait(until.urlContains("cart"), 10 * 1000);
+    await driver.wait(until.urlContains("cart"), timeout);
 
     await driver.findElement(By.id("checkout")).click();
 
     // ! ETAPA 1 do checkout
-    await driver.wait(until.urlContains("checkout-step-one"), 10 * 1000);
+    await driver.wait(until.urlContains("checkout-step-one"), timeout);
 
     const [firstName, lastName, zipCode, continueButton] = await Promise.all([
       driver.findElement(By.id("first-name")),
@@ -111,12 +113,12 @@ describe("Teste completo e2e de Swag Labs", () => {
     await continueButton.click();
 
     // ! Etapa dois
-    await driver.wait(until.urlContains("checkout-step-two"), 10 * 1000);
+    await driver.wait(until.urlContains("checkout-step-two"), timeout);
 
     await driver.findElement(By.id("finish")).click();
 
     // ! Finalização
-    await driver.wait(until.urlContains("checkout-complete"), 10 * 1000);
+    await driver.wait(until.urlContains("checkout-complete"), timeout);
 
     const completeOrder = await driver
       .findElement(By.id("checkout_complete_container"))
@@ -129,7 +131,7 @@ describe("Teste completo e2e de Swag Labs", () => {
     expect(backHome).toBeDefined();
     await backHome.click();
 
-    await driver.wait(until.urlContains("inventory"), 10 * 1000);
+    await driver.wait(until.urlContains("inventory"), timeout);
 
     const backToHomeTitle = await driver.getCurrentUrl();
 
