@@ -7,8 +7,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
-      SAUCE_USER: "standard_user"
-      SAUCE_PASSWORD: "secret_sauce"
+      USER_SAUCE: "standard_user"
+      PASSWORD_SAUCE: "secret_sauce"
     steps:
       - uses: actions/checkout@v4
 
@@ -26,7 +26,7 @@ jobs:
           install-chromedriver: true
           install-dependencies: true
 
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install
 
       - name: Testes
         env:
