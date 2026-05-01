@@ -87,7 +87,7 @@ describe("Teste completo e2e de Swag Labs", () => {
     console.log("STEP: CART");
 
     await driver.wait(until.urlContains("cart"), timeout);
-    // await driver.get("https://www.saucedemo.com/cart.html");
+    await driver.get("https://www.saucedemo.com/cart.html");
 
     const checkoutBtn = await driver.wait(
       until.elementLocated(By.id("checkout")),
