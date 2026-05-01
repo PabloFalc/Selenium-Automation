@@ -13,7 +13,11 @@ jest.setTimeout(60 * 1000);
 describe("Teste completo e2e de Swag Labs", () => {
   it("deve logar, adicionar produto e finalizar compra", async () => {
     await driver.get("https://www.saucedemo.com/");
-    console.log("PORRAAA");
+
+    await driver.wait(async () => {
+      const state = await driver.executeScript("return document.readyState");
+      return state === "complete";
+    }, 10000);
 
     const user = await driver.wait(
       until.elementLocated(By.id("user-name")),
@@ -113,6 +117,13 @@ describe("Teste completo e2e de Swag Labs", () => {
 
     // ! Finalização
     await driver.wait(until.urlContains("checkout-complete"), 10 * 1000);
+
+    const completeOrder = await driver
+      .findElement(By.id("checkout_complete_container"))
+      .findElement(By.className("complete-header"))
+      .getText();
+
+    expect(completeOrder).toBe("Thank you for your order!");
 
     const backHome = await driver.findElement(By.id("back-to-products"));
     expect(backHome).toBeDefined();
