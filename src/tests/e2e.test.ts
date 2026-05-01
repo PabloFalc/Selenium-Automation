@@ -93,7 +93,10 @@ describe("Teste completo e2e de Swag Labs", () => {
 
     await driver.get("https://www.saucedemo.com/cart.html");
 
-    const checkoutBtn = await driver.findElement(By.id("checkout"));
+    const checkoutBtn = await driver.wait(
+      until.elementLocated(By.id("checkout")),
+      timeout,
+    );
 
     expect(checkoutBtn).toBeDefined();
 
