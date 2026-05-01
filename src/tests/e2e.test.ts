@@ -93,9 +93,6 @@ describe("Teste completo e2e de Swag Labs", () => {
 
     console.log("SETP: CARRINHO");
 
-    await driver.wait(until.urlContains("cart"), timeout);
-    console.log("página carregada");
-
     const checkoutBtn = await driver.wait(
       until.elementLocated(By.id("checkout")),
       timeout,
