@@ -70,8 +70,16 @@ describe("Teste completo e2e de Swag Labs", () => {
         until.elementLocated(By.id(item)),
         timeout,
       );
+
       expect(button).toBeDefined();
-      await button.click();
+
+      await driver.executeScript("arguments[0].click();", button);
+
+      await driver.wait(
+        until.elementLocated(By.id(item.replace("add-to-cart", "remove"))),
+        timeout,
+      );
+
       console.log(`STEP: adicionou produto ${index + 1}`);
     }
 
