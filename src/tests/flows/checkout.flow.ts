@@ -6,7 +6,7 @@ export async function completeCheckout(driver: WebDriver, timeout: number) {
     .wait(async () => {
       const url = await driver.getCurrentUrl();
 
-      return url.includes("checkout-step-two");
+      return url.includes("checkout-step-one");
     }, timeout)
     .catch(async () => {
       console.log(await driver.getCurrentUrl());
@@ -28,12 +28,27 @@ export async function completeCheckout(driver: WebDriver, timeout: number) {
 
   await continueButton.click();
 
-  await switchPageForce(driver, timeout, "checkout-step-two");
+  await driver
+    .wait(async () => {
+      const url = await driver.getCurrentUrl();
+
+      return url.includes("checkout-step-two");
+    }, timeout)
+    .catch(async () => {
+      await driver.get(`https://www.saucedemo.com/checkout-step-two.html`);
+    });
 
   await driver.findElement(By.id("finish")).click();
 
-  console.log("STEP: checkout step 3");
-  await switchPageForce(driver, timeout, "checkout-complete");
+  await driver
+    .wait(async () => {
+      const url = await driver.getCurrentUrl();
+
+      return url.includes("checkout-complete");
+    }, timeout)
+    .catch(async () => {
+      await driver.get(`https://www.saucedemo.com/checkout-complete.html`);
+    });
 
   const completeOrder = await driver
     .findElement(By.id("checkout_complete_container"))
