@@ -78,11 +78,16 @@ describe("Teste completo e2e de Swag Labs", () => {
       timeout,
     );
 
-    await driver.wait(until.elementIsVisible(cartLink), timeout);
-    await driver.wait(until.elementIsEnabled(cartLink), timeout);
+    const cartLink2 = await driver.wait(
+      until.elementLocated(By.className("shopping_cart_link")),
+      timeout,
+    );
 
     expect(cartLink).toBeDefined();
     await cartLink.click();
+
+    expect(cartLink2).toBeDefined();
+    await cartLink2.click();
 
     await driver
       .wait(async () => {
@@ -97,6 +102,7 @@ describe("Teste completo e2e de Swag Labs", () => {
         await driver.get("https://www.saucedemo.com/cart.html");
       });
 
+    console.log(await driver.getCurrentUrl());
     const checkoutBtn = await driver.wait(
       until.elementLocated(By.id("checkout")),
       timeout,
