@@ -1,4 +1,5 @@
 import { By, until, type WebDriver } from "selenium-webdriver";
+import { switchPageForce } from "../helper/switch-page.helper";
 
 export async function addProductsToCartAndOpenCart(
   driver: WebDriver,
@@ -14,7 +15,7 @@ export async function addProductsToCartAndOpenCart(
     By.id("remove-sauce-labs-backpack"),
   );
 
-  console.log("ADICIONADO:", removeBtn.length);
+  expect(removeBtn).toBeDefined();
 
   const cartLink = await driver.wait(
     until.elementLocated(By.className("shopping_cart_link")),
@@ -24,16 +25,7 @@ export async function addProductsToCartAndOpenCart(
   expect(cartLink).toBeDefined();
   await cartLink.click();
 
-  await driver
-    .wait(async () => {
-      const url = await driver.getCurrentUrl();
-
-      return url.includes("cart");
-    }, timeout)
-    .catch(async () => {
-      console.log("FORÇANDO NAVEGAÇÃO PRO CARRINHO");
-      await driver.get("https://www.saucedemo.com/cart.html");
-    });
+  await switchPageForce(driver, timeout, "cart");
 
   console.log(await driver.getCurrentUrl());
   await driver.wait(until.urlContains("cart"), timeout);

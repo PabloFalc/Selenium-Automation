@@ -1,16 +1,8 @@
-import { By, until, type WebDriver } from "selenium-webdriver";
+import { By, type WebDriver } from "selenium-webdriver";
+import { switchPageForce } from "../helper/switch-page.helper";
 
 export async function completeCheckout(driver: WebDriver, timeout: number) {
-  await driver
-    .wait(async () => {
-      const url = await driver.getCurrentUrl();
-
-      return url.includes("checkout-step-one");
-    }, timeout)
-    .catch(async () => {
-      console.log("forçando navegação para a primeira etapa");
-      await driver.get("https://www.saucedemo.com/checkout-step-one.html");
-    });
+  await switchPageForce(driver, timeout, "checkout-step-two");
 
   console.log("STEP: checkout step 1");
 
@@ -27,31 +19,12 @@ export async function completeCheckout(driver: WebDriver, timeout: number) {
 
   await continueButton.click();
 
-  await driver
-    .wait(async () => {
-      const url = await driver.getCurrentUrl();
-
-      return url.includes("checkout-step-two");
-    }, timeout)
-    .catch(async () => {
-      console.log("forçando navegação para a primeira etapa");
-      await driver.get("https://www.saucedemo.com/checkout-step-two.html");
-    });
-  console.log("STEP: checkout step 2");
+  await switchPageForce(driver, timeout, "checkout-step-two");
 
   await driver.findElement(By.id("finish")).click();
 
   console.log("STEP: checkout step 3");
-  await driver
-    .wait(async () => {
-      const url = await driver.getCurrentUrl();
-
-      return url.includes("checkout-complete");
-    }, timeout)
-    .catch(async () => {
-      console.log("forçando navegação para a primeira etapa");
-      await driver.get("https://www.saucedemo.com/checkout-complete.html");
-    });
+  await switchPageForce(driver, timeout, "checkout-complete");
 
   const completeOrder = await driver
     .findElement(By.id("checkout_complete_container"))
@@ -61,12 +34,14 @@ export async function completeCheckout(driver: WebDriver, timeout: number) {
   expect(completeOrder).toBe("Thank you for your order!");
 
   const backHome = await driver.findElement(By.id("back-to-products"));
+
   expect(backHome).toBeDefined();
+
   await backHome.click();
 
-  await driver.wait(until.urlContains("inventory"), timeout);
-  console.log("STEP: end");
-  const backToHomeTitle = await driver.getCurrentUrl();
+  await switchPageForce(driver, timeout, "inventory");
 
-  expect(backToHomeTitle).toBe("https://www.saucedemo.com/inventory.html");
+  expect(await driver.getCurrentUrl()).toBe(
+    "https://www.saucedemo.com/inventory.html",
+  );
 }
