@@ -88,8 +88,14 @@ describe("Teste completo e2e de Swag Labs", () => {
 
     await cartLink.click();
     console.log("STEP: carrinho");
+    await driver.wait(
+      until.urlIs("https://www.saucedemo.com/cart.html"),
+      timeout,
+    );
 
-    await driver.findElement(By.id("checkout")).click();
+    const checkoutBtn = await driver.findElement(By.id("checkout"));
+
+    await checkoutBtn.click();
 
     // ! ETAPA 1 do checkout
     await driver.wait(until.urlContains("checkout-step-one"), timeout);
