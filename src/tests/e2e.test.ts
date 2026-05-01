@@ -88,6 +88,8 @@ describe("Teste completo e2e de Swag Labs", () => {
       .wait(async () => {
         const url = await driver.getCurrentUrl();
         console.log(url);
+        const cookies = await driver.manage().getCookies();
+        console.log("COOKIES:", cookies);
         return url.includes("cart");
       }, timeout)
       .catch(async () => {
