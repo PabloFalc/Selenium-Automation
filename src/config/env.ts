@@ -5,7 +5,7 @@ config();
 
 const envShchema = z.object({
   USER: z.string(),
-  PASSWORD: z.string().length(12),
+  PASSWORD: z.string(),
 });
 
 export const env = envShchema.parse(process.env);

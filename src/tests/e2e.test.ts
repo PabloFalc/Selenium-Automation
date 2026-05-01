@@ -17,11 +17,6 @@ describe("Teste completo e2e de Swag Labs", () => {
     await driver.get("https://www.saucedemo.com/");
     console.log("STEP: abriu site");
 
-    await driver.wait(async () => {
-      const state = await driver.executeScript("return document.readyState");
-      return state === "complete";
-    }, timeout);
-
     console.log("STEP: login page carregada");
     const user = await driver.wait(
       until.elementLocated(By.id("user-name")),
@@ -75,10 +70,13 @@ describe("Teste completo e2e de Swag Labs", () => {
         until.elementLocated(By.id(item)),
         timeout,
       );
-
+      expect(button).toBeDefined();
       await button.click();
       console.log(`STEP: adicionou produto ${index + 1}`);
     }
+
+    const items = await driver.findElements(By.className("cart_item"));
+    console.log("ITEMS:", items.length);
 
     const cartLink = await driver.wait(
       until.elementLocated(By.className("shopping_cart_link")),
