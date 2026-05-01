@@ -91,7 +91,14 @@ describe("Teste completo e2e de Swag Labs", () => {
     expect(cartLink).toBeDefined();
     await cartLink.click();
 
+    console.log("STEP: CART");
+
     await driver.get("https://www.saucedemo.com/cart.html");
+
+    await driver.wait(async () => {
+      const state = await driver.executeScript("return document.readyState");
+      return state === "complete";
+    }, timeout);
 
     const checkoutBtn = await driver.wait(
       until.elementLocated(By.id("checkout")),
