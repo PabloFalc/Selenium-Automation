@@ -16,9 +16,19 @@ async function click(element: WebElement) {
   await driver.wait(until.elementIsVisible(element), timeout);
   await driver.wait(until.elementIsEnabled(element), timeout);
   await driver.executeScript(
-    'arguments[0].scrollIntoView({ block: "center" }); arguments[0].click();',
+    'arguments[0].scrollIntoView({ block: "center" });',
     element,
   );
+  await element.click();
+}
+
+async function clickAndWait(element: WebElement, urlPart: string) {
+  await click(element);
+
+  await driver.wait(until.urlContains(urlPart), 5 * 1000).catch(async () => {
+    await driver.executeScript('arguments[0].click();', element);
+    await driver.wait(until.urlContains(urlPart), timeout);
+  });
 }
 
 describe('Teste completo e2e de Swag Labs', () => {
@@ -47,9 +57,7 @@ describe('Teste completo e2e de Swag Labs', () => {
 
     await user.sendKeys(env.USER);
     await password.sendKeys(env.PASSWORD);
-    await click(button);
-
-    await driver.wait(until.urlContains('inventory'), timeout);
+    await clickAndWait(button, 'inventory');
     console.log('STEP: logou');
 
     expect(
@@ -77,8 +85,7 @@ describe('Teste completo e2e de Swag Labs', () => {
       timeout,
     );
 
-    await click(cartLink);
-    await driver.wait(until.urlContains('cart'), timeout);
+    await clickAndWait(cartLink, 'cart');
     console.log(await driver.getCurrentUrl());
 
     const checkoutBtn = await driver.wait(
@@ -86,10 +93,7 @@ describe('Teste completo e2e de Swag Labs', () => {
       timeout,
     );
 
-    await click(checkoutBtn);
-
-    // ! ETAPA 1 do checkout
-    await driver.wait(until.urlContains('checkout-step-one'), timeout);
+    await clickAndWait(checkoutBtn, 'checkout-step-one');
     console.log('STEP: checkout step 1');
 
     const [firstName, lastName, zipCode, continueButton] = await Promise.all([
@@ -103,17 +107,19 @@ describe('Teste completo e2e de Swag Labs', () => {
     await lastName.sendKeys('Falc');
     await zipCode.sendKeys('086');
 
-    await click(continueButton);
+    await driver.wait(async () => {
+      return (
+        (await firstName.getAttribute('value')) === 'Pablo' &&
+        (await lastName.getAttribute('value')) === 'Falc' &&
+        (await zipCode.getAttribute('value')) === '086'
+      );
+    }, timeout);
 
-    // ! ETAPA 2 do checkout
-    await driver.wait(until.urlContains('checkout-step-two'), timeout);
+    await clickAndWait(continueButton, 'checkout-step-two');
     console.log('STEP: checkout step 2');
 
     const finishBtn = await driver.findElement(By.id('finish'));
-    await click(finishBtn);
-
-    // ! Finalizacao
-    await driver.wait(until.urlContains('checkout-complete'), timeout);
+    await clickAndWait(finishBtn, 'checkout-complete');
     console.log('STEP: checkout complete');
     const completeOrder = await driver
       .findElement(By.id('checkout_complete_container'))
@@ -123,9 +129,7 @@ describe('Teste completo e2e de Swag Labs', () => {
     expect(completeOrder).toBe('Thank you for your order!');
 
     const backHome = await driver.findElement(By.id('back-to-products'));
-    await click(backHome);
-
-    await driver.wait(until.urlContains('inventory'), timeout);
+    await clickAndWait(backHome, 'inventory');
     console.log('STEP: end');
     const backToHomeTitle = await driver.getCurrentUrl();
 
