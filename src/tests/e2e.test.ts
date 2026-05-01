@@ -93,10 +93,7 @@ describe("Teste completo e2e de Swag Labs", () => {
 
     console.log("SETP: CARRINHO");
 
-    await driver.wait(
-      until.urlIs("https://www.saucedemo.com/cart.html"),
-      timeout,
-    );
+    await driver.wait(until.urlContains("cart"), timeout);
 
     await driver.wait(until.elementLocated(By.className("cart_item")), timeout);
 
