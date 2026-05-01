@@ -1,158 +1,165 @@
-import { By, until, type WebDriver } from "selenium-webdriver";
-import { env } from "@/config/env";
-import { createDriver } from "@/config/selenium.driver";
+import { mkdir, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { By, until, type WebDriver } from 'selenium-webdriver';
+import { env } from '@/config/env';
+import { createDriver } from '@/config/selenium.driver';
 
 let driver: WebDriver;
+const timeout = 20 * 1000;
 
 beforeAll(async () => {
   driver = await createDriver();
 });
 
-const timeout = 20 * 1000;
-
 jest.setTimeout(60 * 1000);
 
-describe("Teste completo e2e de Swag Labs", () => {
-  it("deve logar, adicionar produto e finalizar compra", async () => {
-    await driver.get("https://www.saucedemo.com/");
-    console.log("STEP: abriu site");
+async function waitForInteractable(locator: By) {
+  const element = await driver.wait(until.elementLocated(locator), timeout);
 
-    console.log("STEP: login page carregada");
-    const user = await driver.wait(
-      until.elementLocated(By.id("user-name")),
-      timeout,
+  await driver.wait(until.elementIsVisible(element), timeout);
+  await driver.wait(until.elementIsEnabled(element), timeout);
+
+  return element;
+}
+
+async function saveFailureArtifacts() {
+  if (!driver) {
+    return;
+  }
+
+  try {
+    await mkdir('artifacts', { recursive: true });
+    await writeFile(
+      join('artifacts', 'e2e-failure.png'),
+      await driver.takeScreenshot(),
+      'base64',
     );
-
-    const password = await driver.wait(
-      until.elementLocated(By.id("password")),
-      timeout,
+    await writeFile(
+      join('artifacts', 'e2e-page-source.html'),
+      await driver.getPageSource(),
     );
+  } catch (error) {
+    console.warn('Nao foi possivel salvar artifacts de falha:', error);
+  }
+}
 
-    const button = await driver.wait(
-      until.elementLocated(By.id("login-button")),
-      timeout,
-    );
+describe('Teste completo e2e de Swag Labs', () => {
+  it('deve logar, adicionar produto e finalizar compra', async () => {
+    try {
+      await driver.get('https://www.saucedemo.com/');
+      console.log('STEP: abriu site');
 
-    expect(user).toBeDefined();
+      console.log('STEP: login page carregada');
+      const user = await waitForInteractable(By.id('user-name'));
+      const password = await waitForInteractable(By.id('password'));
+      const button = await waitForInteractable(By.id('login-button'));
 
-    expect(password).toBeDefined();
+      await user.clear();
+      await password.clear();
 
-    expect(button).toBeDefined();
+      await user.sendKeys(env.USER);
+      await password.sendKeys(env.PASSWORD);
+      await button.click();
 
-    await user.clear();
-    await password.clear();
+      await driver.wait(until.urlContains('inventory'), timeout);
+      console.log('STEP: logou');
 
-    await user.sendKeys(env.USER);
-    await password.sendKeys(env.PASSWORD);
-    await button.click();
+      expect(
+        await Promise.all([driver.getCurrentUrl(), driver.getTitle()]),
+      ).toEqual(
+        expect.arrayContaining([
+          expect.stringContaining('inventory'),
+          'Swag Labs',
+        ]),
+      );
 
-    await driver.wait(until.urlContains("inventory"), timeout);
-    console.log("STEP: logou");
+      const item = await waitForInteractable(
+        By.id('add-to-cart-sauce-labs-backpack'),
+      );
 
-    expect(
-      await Promise.all([driver.getCurrentUrl(), driver.getTitle()]),
-    ).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining("inventory"),
-        "Swag Labs",
-      ]),
-    );
+      await item.click();
 
-    const itemId = "add-to-cart-sauce-labs-backpack";
+      const removeBtn = await driver.findElements(
+        By.id('remove-sauce-labs-backpack'),
+      );
 
-    const item = await driver.wait(
-      until.elementLocated(By.id(itemId)),
-      timeout,
-    );
+      console.log('ADICIONADO:', removeBtn.length);
 
-    await item.click();
+      const cartLink = await waitForInteractable(
+        By.className('shopping_cart_link'),
+      );
 
-    const removeBtn = await driver.findElements(
-      By.id("remove-sauce-labs-backpack"),
-    );
+      await cartLink.click();
 
-    console.log("ADICIONADO:", removeBtn.length);
+      await driver
+        .wait(async () => {
+          const url = await driver.getCurrentUrl();
 
-    const cartLink = await driver.wait(
-      until.elementLocated(By.className("shopping_cart_link")),
-      timeout,
-    );
+          return url.includes('cart');
+        }, timeout)
+        .catch(async () => {
+          console.log('Forcando navegacao para o carrinho');
+          await driver.get('https://www.saucedemo.com/cart.html');
+        });
 
-    expect(cartLink).toBeDefined();
-    await cartLink.click();
+      console.log(await driver.getCurrentUrl());
+      await driver.wait(until.urlContains('cart'), timeout);
 
-    await driver
-      .wait(async () => {
-        const url = await driver.getCurrentUrl();
+      const checkoutBtn = await waitForInteractable(By.id('checkout'));
 
-        return url.includes("cart");
-      }, timeout)
-      .catch(async () => {
-        console.log("FORÇANDO NAVEGAÇÃO PRO CARRINHO");
-        await driver.get("https://www.saucedemo.com/cart.html");
-      });
+      await checkoutBtn.click();
 
-    console.log(await driver.getCurrentUrl());
-    await driver.wait(until.urlContains("cart"), timeout);
-    // const checkoutBtn = await driver.wait(
-    //   until.elementLocated(By.id("checkout")),
-    //   timeout,
-    // );
+      // ! ETAPA 1 do checkout
+      await driver.wait(until.urlContains('checkout-step-one'), timeout);
+      console.log('STEP: checkout step 1');
 
-    const checkoutBtn = await driver.findElement(By.id("checkout"));
+      const [firstName, lastName, zipCode, continueButton] = await Promise.all([
+        waitForInteractable(By.id('first-name')),
+        waitForInteractable(By.id('last-name')),
+        waitForInteractable(By.id('postal-code')),
+        waitForInteractable(By.id('continue')),
+      ]);
 
-    expect(checkoutBtn).toBeDefined();
+      await firstName.sendKeys('Pablo');
+      await lastName.sendKeys('Falc');
+      await zipCode.sendKeys('086');
 
-    await driver.wait(until.elementIsVisible(checkoutBtn), timeout);
-    await driver.wait(until.elementIsEnabled(checkoutBtn), timeout);
+      await continueButton.click();
 
-    await checkoutBtn.click();
+      // ! ETAPA 2 do checkout
+      await driver.wait(until.urlContains('checkout-step-two'), timeout);
+      console.log('STEP: checkout step 2');
 
-    // ! ETAPA 1 do checkout
-    await driver.wait(until.urlContains("checkout-step-one"), timeout);
-    console.log("STEP: checkout step 1");
+      const finishBtn = await waitForInteractable(By.id('finish'));
+      await finishBtn.click();
 
-    const [firstName, lastName, zipCode, continueButton] = await Promise.all([
-      driver.findElement(By.id("first-name")),
-      driver.findElement(By.id("last-name")),
-      driver.findElement(By.id("postal-code")),
-      driver.findElement(By.id("continue")),
-    ]);
+      // ! Finalizacao
+      await driver.wait(until.urlContains('checkout-complete'), timeout);
+      console.log('STEP: checkout complete');
+      const completeOrder = await driver
+        .findElement(By.id('checkout_complete_container'))
+        .findElement(By.className('complete-header'))
+        .getText();
 
-    await firstName.sendKeys("Pablo");
-    await lastName.sendKeys("Falc");
-    await zipCode.sendKeys("086");
+      expect(completeOrder).toBe('Thank you for your order!');
 
-    await continueButton.click();
+      const backHome = await waitForInteractable(By.id('back-to-products'));
+      await backHome.click();
 
-    // ! Etapa dois
-    await driver.wait(until.urlContains("checkout-step-two"), timeout);
-    console.log("STEP: checkout step 2");
+      await driver.wait(until.urlContains('inventory'), timeout);
+      console.log('STEP: end');
+      const backToHomeTitle = await driver.getCurrentUrl();
 
-    await driver.findElement(By.id("finish")).click();
-
-    // ! Finalização
-    await driver.wait(until.urlContains("checkout-complete"), timeout);
-    console.log("STEP: checkout complete");
-    const completeOrder = await driver
-      .findElement(By.id("checkout_complete_container"))
-      .findElement(By.className("complete-header"))
-      .getText();
-
-    expect(completeOrder).toBe("Thank you for your order!");
-
-    const backHome = await driver.findElement(By.id("back-to-products"));
-    expect(backHome).toBeDefined();
-    await backHome.click();
-
-    await driver.wait(until.urlContains("inventory"), timeout);
-    console.log("STEP: end");
-    const backToHomeTitle = await driver.getCurrentUrl();
-
-    expect(backToHomeTitle).toBe("https://www.saucedemo.com/inventory.html");
+      expect(backToHomeTitle).toBe('https://www.saucedemo.com/inventory.html');
+    } catch (error) {
+      await saveFailureArtifacts();
+      throw error;
+    }
   });
 });
 
 afterAll(async () => {
-  await driver.quit();
+  if (driver) {
+    await driver.quit();
+  }
 });

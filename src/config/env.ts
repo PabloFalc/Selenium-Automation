@@ -1,11 +1,24 @@
-import { config } from "dotenv";
-import { z } from "zod";
+import { config } from 'dotenv';
+import { z } from 'zod';
 
 config();
 
-const envShchema = z.object({
-  USER: z.string(),
-  PASSWORD: z.string(),
+const envSchema = z.object({
+  SAUCE_USER: z.string().optional(),
+  SAUCE_PASSWORD: z.string().optional(),
+  USER: z.string().optional(),
+  PASSWORD: z.string().optional(),
 });
 
-export const env = envShchema.parse(process.env);
+export const env = envSchema
+  .transform((values) => ({
+    USER: values.SAUCE_USER ?? values.USER,
+    PASSWORD: values.SAUCE_PASSWORD ?? values.PASSWORD,
+  }))
+  .pipe(
+    z.object({
+      USER: z.string().min(1),
+      PASSWORD: z.string().min(1),
+    }),
+  )
+  .parse(process.env);
