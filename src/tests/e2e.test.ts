@@ -89,6 +89,14 @@ describe("Teste completo e2e de Swag Labs", () => {
     await driver.wait(until.urlContains("cart"), timeout);
     await driver.get("https://www.saucedemo.com/cart.html");
 
+    const userAGAIN = await driver.wait(
+      until.elementLocated(By.id("user-name")),
+      timeout,
+    );
+
+    expect(userAGAIN).toBeUndefined();
+
+    await driver.get("https://www.saucedemo.com/cart.html");
     const checkoutBtn = await driver.wait(
       until.elementLocated(By.id("checkout")),
       timeout,
