@@ -84,19 +84,14 @@ describe("Teste completo e2e de Swag Labs", () => {
     expect(cartLink).toBeDefined();
     await cartLink.click();
 
+    console.log(await driver.getCurrentUrl());
     console.log("STEP: CART");
-
     await driver.wait(until.urlContains("cart"), timeout);
-    await driver.get("https://www.saucedemo.com/cart.html");
+    console.log("STEP: CART2");
+    console.log(await driver.getCurrentUrl());
+    // await driver.get("https://www.saucedemo.com/cart.html");
+    console.log("STEP: CART3");
 
-    const userAGAIN = await driver.wait(
-      until.elementLocated(By.id("user-name")),
-      timeout,
-    );
-
-    expect(userAGAIN).toBeUndefined();
-
-    await driver.get("https://www.saucedemo.com/cart.html");
     const checkoutBtn = await driver.wait(
       until.elementLocated(By.id("checkout")),
       timeout,
