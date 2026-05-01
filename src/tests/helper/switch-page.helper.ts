@@ -12,6 +12,7 @@ export async function switchPageForce(
       return url.includes(url);
     }, timeout)
     .catch(async () => {
+      console.log(await driver.getCurrentUrl());
       await driver.get(`https://www.saucedemo.com/${url}.html`);
     });
 }
