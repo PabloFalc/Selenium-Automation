@@ -93,15 +93,15 @@ describe("Teste completo e2e de Swag Labs", () => {
       .wait(async () => {
         const url = await driver.getCurrentUrl();
         console.log(url);
-        const cookies = await driver.manage().getCookies();
-        console.log("COOKIES:", cookies);
+
         return url.includes("cart");
       }, timeout)
       .catch(async () => {
         console.log("FORÇANDO NAVEGAÇÃO PRO CARRINHO");
         await driver.get("https://www.saucedemo.com/cart.html");
       });
-
+    const cookies = await driver.manage().getCookies();
+    console.log("COOKIES:", cookies);
     console.log(await driver.getCurrentUrl());
     const checkoutBtn = await driver.wait(
       until.elementLocated(By.id("checkout")),
