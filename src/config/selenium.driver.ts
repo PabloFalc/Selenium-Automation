@@ -4,12 +4,9 @@ import chrome from "selenium-webdriver/chrome.js";
 export async function createDriver() {
   const options = new chrome.Options();
 
-  // ! Importante se o navegador for o brave
-  options.setChromeBinaryPath(
-    "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe",
-  );
-
   options.addArguments("--headless=new");
+  options.addArguments("--no-sandbox");
+  options.addArguments("--disable-dev-shm-usage");
 
   const driver = await new Builder()
     .forBrowser("chrome")

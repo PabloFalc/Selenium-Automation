@@ -17,6 +17,8 @@ jobs:
           node-version: 24
           cache: "pnpm"
 
+      - uses: browser-actions/setup-chrome@v1
+
       - run: pnpm install
 
       - name: testes

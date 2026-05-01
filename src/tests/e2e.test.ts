@@ -8,11 +8,12 @@ beforeAll(async () => {
   driver = await createDriver();
 });
 
-jest.setTimeout(20 * 1000);
+jest.setTimeout(60 * 1000);
 
 describe("Teste completo e2e de Swag Labs", () => {
   it("deve logar, adicionar produto e finalizar compra", async () => {
     await driver.get("https://www.saucedemo.com/");
+    console.log("PORRAAA");
 
     const user = await driver.wait(
       until.elementLocated(By.id("user-name")),
