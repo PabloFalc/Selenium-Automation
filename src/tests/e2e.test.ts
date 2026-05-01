@@ -79,19 +79,16 @@ describe("Teste completo e2e de Swag Labs", () => {
       await button.click();
       console.log(`STEP: adicionou produto ${index + 1}`);
     }
-    await driver.findElement(By.className("shopping_cart_link")).click();
 
     const cartLink = await driver.wait(
-      until.elementLocated(By.className("shopping_cart_link")),
+      until.elementLocated(By.id("shopping_cart_container")),
       timeout,
     );
-
-    await driver.wait(until.elementIsVisible(cartLink), timeout);
-    await driver.wait(until.elementIsEnabled(cartLink), timeout);
 
     await cartLink.click();
 
     console.log("SETP: CARRINHO");
+
     await driver.wait(async () => {
       const url = await driver.getCurrentUrl();
       return url.includes("cart");
