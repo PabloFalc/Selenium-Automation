@@ -7,12 +7,21 @@ export async function createDriver() {
   const chromeDriverBinary =
     process.env.CHROMEDRIVER_BIN ?? process.env.CHROMEDRIVER_PATH;
 
-  options.addArguments('--headless=new');
-  options.addArguments('--no-sandbox');
-  options.addArguments('--disable-dev-shm-usage');
-  options.addArguments('--disable-gpu');
-  options.addArguments('--window-size=1920,1080');
-  options.addArguments('--remote-debugging-port=9222');
+  options.addArguments("--headless=new");
+
+  options.addArguments("--no-sandbox");
+  options.addArguments("--disable-dev-shm-usage");
+  options.addArguments("--disable-gpu");
+
+  options.addArguments("--window-size=1920,1080");
+  options.addArguments("--start-maximized");
+
+  options.addArguments("--disable-infobars");
+  options.addArguments("--disable-notifications");
+  options.addArguments("--disable-extensions");
+  options.addArguments("--disable-software-rasterizer");
+
+  options.addArguments("--remote-allow-origins=*");
 
   if (chromeBinary) {
     options.setChromeBinaryPath(chromeBinary);
