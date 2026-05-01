@@ -8,7 +8,7 @@ beforeAll(async () => {
   driver = await createDriver();
 });
 
-const timeout = 60 * 1000;
+const timeout = 20 * 1000;
 
 jest.setTimeout(60 * 1000);
 
@@ -87,12 +87,14 @@ describe("Teste completo e2e de Swag Labs", () => {
     await driver
       .wait(async () => {
         const url = await driver.getCurrentUrl();
+        console.log(url);
         return url.includes("cart");
       }, timeout)
       .catch(async () => {
         console.log("FORÇANDO NAVEGAÇÃO PRO CARRINHO");
         await driver.get("https://www.saucedemo.com/cart.html");
       });
+
     const checkoutBtn = await driver.wait(
       until.elementLocated(By.id("checkout")),
       timeout,
