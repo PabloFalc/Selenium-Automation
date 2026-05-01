@@ -63,7 +63,15 @@ export async function completeCheckout(driver: WebDriver, timeout: number) {
 
   await backHome.click();
 
-  await switchPageForce(driver, timeout, "inventory");
+  await driver
+    .wait(async () => {
+      const url = await driver.getCurrentUrl();
+
+      return url.includes("inventory");
+    }, timeout)
+    .catch(async () => {
+      await driver.get(`https://www.saucedemo.com/inventory.html`);
+    });
 
   expect(await driver.getCurrentUrl()).toBe(
     "https://www.saucedemo.com/inventory.html",
