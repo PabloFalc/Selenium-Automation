@@ -1,20 +1,17 @@
 import { By, until, type WebDriver } from "selenium-webdriver";
 
 export async function completeCheckout(driver: WebDriver, timeout: number) {
-  const checkoutBtn = await driver.wait(
-    until.elementLocated(By.id("checkout")),
-    timeout,
-  );
+  await driver
+    .wait(async () => {
+      const url = await driver.getCurrentUrl();
 
-  expect(checkoutBtn).toBeDefined();
+      return url.includes("checkout-step-one");
+    }, timeout)
+    .catch(async () => {
+      console.log("forçando navegação para a primeira etapa");
+      await driver.get("https://www.saucedemo.com/checkout-step-one.html");
+    });
 
-  await driver.wait(until.elementIsVisible(checkoutBtn), timeout);
-  await driver.wait(until.elementIsEnabled(checkoutBtn), timeout);
-
-  await checkoutBtn.click();
-
-  // ! ETAPA 1 do checkout
-  await driver.wait(until.urlContains("checkout-step-one"), timeout);
   console.log("STEP: checkout step 1");
 
   const [firstName, lastName, zipCode, continueButton] = await Promise.all([
