@@ -10,7 +10,7 @@ beforeEach(async () => {
   driver = await createDriver();
 });
 
-const timeout = 20 * 1000;
+const timeout = 10 * 1000;
 
 jest.setTimeout(120 * 1000);
 

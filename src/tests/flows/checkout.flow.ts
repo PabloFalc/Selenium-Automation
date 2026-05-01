@@ -2,7 +2,7 @@ import { By, type WebDriver } from "selenium-webdriver";
 import { switchPageForce } from "../helper/switch-page.helper";
 
 export async function completeCheckout(driver: WebDriver, timeout: number) {
-  await switchPageForce(driver, timeout, "checkout-step-two");
+  await switchPageForce(driver, timeout, "checkout-step-one");
 
   console.log("STEP: checkout step 1");
 
