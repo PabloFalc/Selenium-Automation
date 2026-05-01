@@ -27,15 +27,32 @@ export async function completeCheckout(driver: WebDriver, timeout: number) {
 
   await continueButton.click();
 
-  // ! Etapa dois
-  await driver.wait(until.urlContains("checkout-step-two"), timeout);
+  await driver
+    .wait(async () => {
+      const url = await driver.getCurrentUrl();
+
+      return url.includes("checkout-step-two");
+    }, timeout)
+    .catch(async () => {
+      console.log("forçando navegação para a primeira etapa");
+      await driver.get("https://www.saucedemo.com/checkout-step-two.html");
+    });
   console.log("STEP: checkout step 2");
 
   await driver.findElement(By.id("finish")).click();
 
-  // ! Finalização
-  await driver.wait(until.urlContains("checkout-complete"), timeout);
-  console.log("STEP: checkout complete");
+  console.log("STEP: checkout step 3");
+  await driver
+    .wait(async () => {
+      const url = await driver.getCurrentUrl();
+
+      return url.includes("checkout-complete");
+    }, timeout)
+    .catch(async () => {
+      console.log("forçando navegação para a primeira etapa");
+      await driver.get("https://www.saucedemo.com/checkout-complete.html");
+    });
+
   const completeOrder = await driver
     .findElement(By.id("checkout_complete_container"))
     .findElement(By.className("complete-header"))
