@@ -81,7 +81,7 @@ describe("Teste completo e2e de Swag Labs", () => {
     }
 
     const cartLink = await driver.wait(
-      until.elementLocated(By.id("shopping_cart_container")),
+      until.elementLocated(By.className("shopping_cart_link")),
       timeout,
     );
 
