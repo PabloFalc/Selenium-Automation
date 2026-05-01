@@ -93,10 +93,9 @@ describe("Teste completo e2e de Swag Labs", () => {
 
     console.log("SETP: CARRINHO");
 
-    const checkoutBtn = await driver.wait(
-      until.elementLocated(By.id("checkout")),
-      timeout,
-    );
+    const checkoutBtn = await driver.findElement(By.id("checkout"));
+
+    expect(checkoutBtn).toBeDefined();
 
     await driver.wait(until.elementIsVisible(checkoutBtn), timeout);
     await driver.wait(until.elementIsEnabled(checkoutBtn), timeout);
