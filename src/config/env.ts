@@ -3,9 +3,14 @@ import { z } from "zod";
 
 config();
 
-const envShchema = z.object({
-  USER: z.string(),
-  PASSWORD: z.string(),
+const envSchema = z.object({
+  USER_SAUCE: z.string(),
+  PASSWORD_SAUCE: z.string(),
 });
 
-export const env = envShchema.parse(process.env);
+export const env = envSchema
+  .transform((data) => ({
+    USER: data.USER_SAUCE,
+    PASSWORD: data.PASSWORD_SAUCE,
+  }))
+  .parse(process.env);
