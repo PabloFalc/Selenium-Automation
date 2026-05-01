@@ -89,11 +89,6 @@ describe("Teste completo e2e de Swag Labs", () => {
 
     console.log("SETP: CARRINHO");
 
-    await driver.wait(async () => {
-      const url = await driver.getCurrentUrl();
-      return url.includes("cart");
-    }, timeout);
-
     await driver.wait(until.urlContains("cart"), timeout);
     console.log("página carregada");
 
