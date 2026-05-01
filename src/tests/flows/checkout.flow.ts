@@ -2,7 +2,16 @@ import { By, type WebDriver } from "selenium-webdriver";
 import { switchPageForce } from "../helper/switch-page.helper";
 
 export async function completeCheckout(driver: WebDriver, timeout: number) {
-  await switchPageForce(driver, timeout, "checkout-step-one");
+  await driver
+    .wait(async () => {
+      const url = await driver.getCurrentUrl();
+
+      return url.includes("checkout-step-two");
+    }, timeout)
+    .catch(async () => {
+      console.log(await driver.getCurrentUrl());
+      await driver.get(`https://www.saucedemo.com/checkout-step-one.html`);
+    });
 
   console.log("STEP: checkout step 1");
 
