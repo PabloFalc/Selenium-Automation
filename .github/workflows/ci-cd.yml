@@ -26,11 +26,6 @@ jobs:
           install-chromedriver: true
           install-dependencies: true
 
-      - name: Browser versions
-        run: |
-          "${{ steps.setup-chrome.outputs.chrome-path }}" --version
-          "${{ steps.setup-chrome.outputs.chromedriver-path }}" --version
-
       - run: pnpm install --frozen-lockfile
 
       - name: Testes
@@ -38,11 +33,3 @@ jobs:
           CHROME_BIN: ${{ steps.setup-chrome.outputs.chrome-path }}
           CHROMEDRIVER_BIN: ${{ steps.setup-chrome.outputs.chromedriver-path }}
         run: pnpm test --runInBand
-
-      - name: Upload failure artifacts
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: selenium-failure-artifacts
-          path: artifacts/
-          if-no-files-found: ignore
