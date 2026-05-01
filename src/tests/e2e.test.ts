@@ -21,6 +21,9 @@ describe("Teste completo e2e de Swag Labs", () => {
       return state === "complete";
     }, timeout);
 
+    console.log("ENV USER:", env.USER);
+    console.log("ENV PASS:", env.PASSWORD);
+
     const user = await driver.wait(
       until.elementLocated(By.id("user-name")),
       timeout,
@@ -49,7 +52,7 @@ describe("Teste completo e2e de Swag Labs", () => {
     await password.sendKeys(env.PASSWORD);
     await button.click();
 
-    await driver.wait(until.urlContains("inventory"));
+    await driver.wait(until.urlContains("inventory"), timeout);
 
     expect(
       await Promise.all([driver.getCurrentUrl(), driver.getTitle()]),
